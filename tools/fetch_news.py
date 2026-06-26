@@ -15,7 +15,12 @@ RSS_FEEDS = [
     ("글로벌거시", "https://news.google.com/rss/search?q=Federal+Reserve+interest+rate+inflation&hl=en&gl=US&ceid=US:en", False),
 ]
 
-_CUTOFF_HOURS = 36
+def _cutoff_hours() -> float:
+    """평일 09~17시: 30분, 그 외(새벽·주말): 2시간."""
+    now = datetime.now(_KST)
+    is_weekday = now.weekday() < 5  # 0=월 ~ 4=금
+    is_daytime = 9 <= now.hour < 17
+    return 0.5 if (is_weekday and is_daytime) else 2.0
 
 
 def _strip_source_suffix(title: str) -> str:
@@ -59,7 +64,7 @@ def _pub_dt(entry) -> datetime | None:
 
 def get_news(max_items: int = 12) -> list[dict]:
     """Google News RSS에서 경제 뉴스 수집. 국내는 오늘 날짜 기사 우선."""
-    cutoff   = datetime.now(tz=timezone.utc) - timedelta(hours=_CUTOFF_HOURS)
+    cutoff   = datetime.now(tz=timezone.utc) - timedelta(hours=_cutoff_hours())
     today_kst = datetime.now(_KST).date()
     articles = []
 
