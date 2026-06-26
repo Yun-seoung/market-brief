@@ -1,0 +1,7 @@
+requests
+python-dotenv
+beautifulsoup4
+yfinance
+feedparser
+fpdf2
+notion-client
